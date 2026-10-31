@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора - MegaNet</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* Стили, специфичные для админ-панели */
+        body {
+            background-color: #0f172a;
+            display: block; /* Переопределяем flex с главной страницы */
+        }
+
+        .admin-header {
+            background-color: #1e293b;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-header h1 {
+            font-size: 20px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logout-btn {
+            background: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* Вкладки */
+        .tabs-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #334155;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: #94a3b8;
+            border: none;
+            padding: 12px 20px;
+            font-size: 15px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: #f8fafc;
+            background: rgba(51, 65, 85, 0.5);
+        }
+
+        .tab-btn.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Таблицы */
+        .table-wrapper {
+            background: #1e293b;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            overflow-x: auto; /* Скролл на мобилках */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 15px;
+            font-weight: 600;
+            border-bottom: 1px solid #334155;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #334155;
+            color: #f8fafc;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(51, 65, 85, 0.3);
+        }
+
+        /* Бейджи ролей */
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge.admin {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        .badge.user {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        /* Ошибка загрузки */
+        #adminError {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ef4444;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Адаптив для мобилок */
+        @media (max-width: 768px) {
+            .admin-header { padding: 15px; }
+            .admin-container { padding: 0 10px; }
+            th, td { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Шапка админки -->
+    <header class="admin-header">
+        <h1>
+            <span style="font-size: 24px;">🛡️</span> 
+            Админ-панель MegaNet
+        </h1>
+        <a href="/logout" class="logout-btn">Выйти</a>
+    </header>
+
+    <div class="admin-container">
+        
+        <!-- Сообщение об ошибке -->
+        <div id="adminError"></div>
+
+        <!-- Навигация по вкладкам -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-target="tab-users">👥 Пользователи</button>
+            <button class="tab-btn" data-target="tab-fingerprints">📱 Отпечатки устройств</button>
+            <button class="tab-btn" data-target="tab-logs">📊 Логи активности (Трекер)</button>
+        </div>
+
+        <!-- Вкладка 1: Пользователи -->
+        <div id="tab-users" class="tab-content active">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Телефон</th>
+                            <th>Дата регистрации</th>
+                            <th>Роль</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr><td colspan="5" style="text-align:center;">Загрузка данных...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Вкладка 2: Отпечатки -->
+        <div id="tab-fingerprints" class="tab-content">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Время визита</th>
+                            <th>ID Отпечатка (Hash)</th>
+                            <th>Устройство / Экран</th>
+                            <th>Часовой пояс</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fingerprintsTableBody">
+                        <tr><td colspan="4" style="text-align:center;">Загрузка данных...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Вкладка 3: Логи трекера -->
+        <div id="tab-logs" class="tab-content">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Время</th>
+                            <th>Действие</th>
+                            <th>Страница (URL)</th>
+                            <th>ID Сессии</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody">
+                        <tr><td colspan="4" style="text-align:center;">Загрузка данных...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Подключаем скрипт логики админки -->
+    <script src="../js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Вход в сеть WiFi</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+
+    <div class="auth-container">
+        <div class="auth-header">
+            <a href="index.html" class="back-link">← На главную</a>
+            <div class="logo">
+                <span class="logo-icon">📶</span>
+                <span class="logo-text">MegaNet</span>
+            </div>
+            <h2>Вход в систему</h2>
+            <p>Авторизуйтесь, чтобы получить доступ в интернет</p>
+        </div>
+
+        <form id="loginForm" class="auth-form" action="/api/auth/login" method="POST">
+            
+            <div class="form-group">
+                <label for="login">Логин или номер телефона</label>
+                <!-- Для админа: admin, для юзера: его телефон -->
+                <input type="text" id="login" name="login" placeholder="admin или +7..." required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" placeholder="Введите пароль" required>
+            </div>
+
+            <div id="loginError" class="error-message" style="display: none; color: #ff4d4d; margin-bottom: 10px; font-size: 14px;">
+                Неверный логин или пароль
+            </div>
+
+            <button type="submit" class="btn btn-large btn-primary btn-block">Войти</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Нет аккаунта? <a href="register.html">Зарегистрироваться</a></p>
+        </div>
+    </div>
+
+    <!-- Подключаем скрипты для логики входа и трекинга -->
+    <script src="js/tracker.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>
